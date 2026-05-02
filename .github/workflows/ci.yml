@@ -54,3 +54,19 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/deploy_express_crud:latest
+
+
+  deploy:
+    needs: build  # This tells GitHub: "Wait for the build job to finish first!"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to AWS EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd express_app
+            sudo docker compose pull
+            sudo docker compose up -d
