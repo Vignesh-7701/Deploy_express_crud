@@ -1,0 +1,32 @@
+name: Node.js CI Pipeline
+
+# 1. THE TRIGGER: When should this pipeline run?
+on:
+  push:
+    branches: [ "main", "master" ]
+
+# 2. THE JOBS: What should the pipeline do?
+jobs:
+  test-app:
+    # We tell GitHub to spin up a fresh, blank Linux machine for us
+    runs-on: ubuntu-latest
+
+    # 3. THE STEPS: The exact commands to run on that Linux machine
+    steps:
+    # Step A: Download our code from the GitHub repository onto this machine
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Step B: Install Node.js on this machine
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+
+    # Step C: Install our dependencies (Express, Jest, etc.)
+    - name: Install Dependencies
+      run: npm install
+
+    # Step D: Run our tests!
+    - name: Run Jest Tests
+      run: npm test

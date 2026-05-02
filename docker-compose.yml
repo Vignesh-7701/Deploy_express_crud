@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # --- THE DATABASE CONTAINER ---
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} # Pulls password directly from our .env file
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3306"
+    volumes:
+      # This saves our database data on our Windows hard drive so it survives container restarts
+      - db_data:/var/lib/mysql
+      # This injects our table creation script into the container's startup folder
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # --- THE NODE APP CONTAINER ---
+  app:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env # Loads all our local environment variables
+    environment:
+      # THIS IS CRITICAL: We override the DB_HOST from our .env file. 
+      # We tell Node to look for the service named 'db' instead of 'localhost'.
+      - DB_HOST=db 
+    depends_on:
+      - db # Ensures the database starts before the app
+
+volumes:
+  db_data: # Declares the named volume used by the db service
