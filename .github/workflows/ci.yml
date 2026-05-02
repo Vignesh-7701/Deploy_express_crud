@@ -10,29 +10,27 @@ jobs:
   test-app:
     # We tell GitHub to spin up a fresh, blank Linux machine for us
     runs-on: ubuntu-latest
-
     # 3. THE STEPS: The exact commands to run on that Linux machine
     steps:
-    # Step A: Download our code from the GitHub repository onto this machine
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      # Step A: Download our code from the GitHub repository onto this machine
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    # Step B: Install Node.js on this machine
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
+      # Step B: Install Node.js on this machine
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
 
-    # Step C: Install our dependencies (Express, Jest, etc.)
-    - name: Install Dependencies
-      run: npm install
+      # Step C: Install our dependencies (Express, Jest, etc.)
+      - name: Install Dependencies
+        run: npm install
 
-    # Step D: Run our tests!
-    - name: Run Jest Tests
-      run: npm test
+      # Step D: Run our tests!
+      - name: Run Jest Tests
+        run: npm test
 
-
-      # --- JOB 2: BUILD AND PUSH TO DOCKER HUB (New!) ---
+  # --- JOB 2: BUILD AND PUSH TO DOCKER HUB ---
   build-and-push:
     needs: test-app # CRITICAL: This tells GitHub to wait. If tests fail, it will NOT push a broken image!
     runs-on: ubuntu-latest
@@ -55,9 +53,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/deploy_express_crud:latest
 
-
+  # --- JOB 3: DEPLOY TO AWS ---
   deploy:
-    needs: build  # This tells GitHub: "Wait for the build job to finish first!"
+    needs: build-and-push  # FIX: We changed this to match the name of Job 2!
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to AWS EC2
