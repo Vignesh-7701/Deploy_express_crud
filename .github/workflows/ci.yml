@@ -53,4 +53,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/express_crud:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/deploy_express_crud:latest
